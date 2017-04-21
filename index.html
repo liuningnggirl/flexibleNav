@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        list-style: none
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .clear {
+        zoom: 1;
+    }
+
+    .clear:after {
+        display: block;
+        content: '';
+        clear: both;
+    }
+
+    .menu {
+        background-color: #000;
+        border-bottom: 2px solid #e15671;
+    }
+
+    .menu .wrapper {
+        width: 1200px;
+        position: relative;
+    }
+
+    .menu .box {
+        width: 0px;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        background-color: #e15671;
+        overflow: visible;
+    }
+
+    .menu .box .left {
+        width: 0;
+        height: 100%;
+        background-color: #e15671;
+        border-radius: 50%;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .menu .box .right {
+        width: 0;
+        height: 100%;
+        background-color: #000;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .menu ul {
+        overflow: hidden;
+        zoom: 1;
+        float: right;
+    }
+
+    .menu ul li {
+        float: left;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+    }
+
+    .menu ul li a {
+        color: #fff;
+        display: block;
+        padding: 0 18px;
+        position: relative;
+    }
+</style>
+<body>
+<div class="menu">
+    <div class="wrapper clear">
+        <div class="box">
+            <div class="left"></div>
+            <div class="right"></div>
+        </div>
+        <ul>
+            <li><a href="javascript:;">首页</a></li>
+            <li><a href="javascript:;">课程</a></li>
+            <li class="cur"><a href="javascript:;">视频</a></li>
+            <li><a href="javascript:;">社区</a></li>
+            <li><a href="javascript:;">作品案例</a></li>
+        </ul>
+    </div>
+</div>
+</body>
+<script src="http://www.miaov.com/static/ie/js/jquery-1.11.3.min.js"></script>
+<script>
+
+    var menu = {
+        oBox: null,
+        oUl: null,
+        oLi: null,
+        oLeft: null,
+        oRight: null,
+        cur: null,
+        index: 0,
+        rIndex: 0,
+        dir: -1,
+        init: function () {
+            this.oBox = $(".menu .box"), this.oUl = $(".menu ul"), this.oLi = $(".menu ul li"), this.cur = $(".menu ul li.cur");
+            this.oLeft = this.oBox.find('.left'), this.oRight = this.oBox.find('.right');
+            this.rIndex = this.index = this.cur.index() || 0;
+            var x = this.cur[0].offsetLeft, w = this.cur.width();
+            this.move(x, w);
+            this.events();
+        },
+        events: function () {
+            var __this = this;
+            __this.oLi.on('mouseenter', function () {
+                var x = this.offsetLeft, w = $(this).width();
+                var _index = $(this).index(), dir = -1;
+                dir = _index > __this.index ? 1 : 0;
+                __this.index = _index;
+
+                __this.dir = dir;
+                __this.move(x, w);
+            });
+            var outIndex = 0;
+            __this.oLi.on('mouseout', function () {
+                outIndex = $(this).index()
+            });
+            __this.oUl.on('mouseleave', function () {
+                var x = __this.cur[0].offsetLeft, w = __this.cur.width();
+                if (outIndex != __this.rIndex) {
+                    __this.dir = outIndex < __this.rIndex ? 1 : 0;
+                    __this.move(x, w);
+                }
+                __this.index = __this.rIndex;
+            });
+
+        },
+        move: function (x, w) {
+            var __this = this;
+
+            __this._animate(x, w);
+            setTimeout(function () {
+                __this._animate(x, w, w / 2)
+            }, 200);
+        },
+        _animate: function (x, w, m) {
+            var __this = this;
+            __this.oBox.stop(!0, !1).animate({
+                left: x + 'px',
+                width: w + 'px'
+            }, 100).css({'-webkit-filter': 'blur(2px)'});
+            if (__this.dir >= 0) {
+                w = m || w;
+                if (__this.dir) {
+                    __this.oLeft.css({'background-color': '#000'}).stop(!0, !1).animate({
+                        width: w / 2 + 'px',
+                        left: -w / 4 + 'px'
+                    }, 100);
+                    __this.oRight.css({'background-color': '#e15671'}).stop(!0, !1).animate({
+                        width: w / 2 + 'px',
+                        right: -w / 4 + 'px'
+                    }, 100);
+                } else {
+                    __this.oLeft.css({'background-color': '#e15671'}).stop(!0, !1).animate({
+                        width: w / 2 + 'px',
+                        left: -w / 4 + 'px'
+                    }, 100);
+                    __this.oRight.css({'background-color': '#000'}).stop(!0, !1).animate({
+                        width: w / 2 + 'px',
+                        right: -w / 4 + 'px'
+                    }, 100);
+                }
+            }
+            setTimeout(function () {
+                __this.oBox.css({'-webkit-filter': 'blur(0)'});
+                __this.oLeft.stop(!0, !1).animate({width: '0px', left: '0px'}, 100);
+                __this.oRight.stop(!0, !1).animate({width: '0px', right: '0px'}, 100);
+            }, 100);
+        }
+    }
+    menu.init();
+
+</script>
+</html>
